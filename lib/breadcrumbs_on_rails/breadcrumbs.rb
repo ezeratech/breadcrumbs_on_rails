@@ -79,16 +79,17 @@ module BreadcrumbsOnRails
     class SimpleBuilder < Builder
 
       def render
-        @elements.collect do |element|
-          render_element(element)
+        @elements.each_with_index.collect do |element, index|
+          render_element(element, index)
         end.join(@options[:separator] || " &raquo; ")
       end
 
-      def render_element(element)
+      def render_element(element, index)
         if element.path == nil
           content = compute_name(element)
         else
-          content = @context.link_to_unless_current(compute_name(element), compute_path(element), element.options)
+          tag_class = "#{ element.options[:class] } breadcrumb-#{index}".strip
+          content = @context.link_to_unless_current(compute_name(element), compute_path(element), element.options.merge(class: tag_class))
         end
         if @options[:tag]
           @context.content_tag(@options[:tag], content)
